@@ -40,6 +40,10 @@ async def classify_intent(state: GraphState) -> GraphState:
         # stale checkpointed state.  Also clear artefacts from the previous plan
         # so the planner starts from a clean slate and the next classify_intent
         # call cannot drift toward "modify" based on a ghost itinerary.
+
+        # [Point to Discuss] [Concern3] All though IntentDecision class defines destination, start_date and
+        # [Point to Discuss] [Concern3] end_date, the INTENT_SYSTEM_PROMPT instructs the agent to only respond
+        # [Point to Discuss] [Concern3] with one word. So these vaules might always be None.
         if decision.destination:
             updates["destination"] = decision.destination
         if decision.start_date:
@@ -61,6 +65,7 @@ async def classify_intent(state: GraphState) -> GraphState:
     else:
         # For modify/chat/disruption: only fill in context not already provided
         # by the API caller or a prior run in this conversation.
+        # [Point to Discuss] [Concern3] Below also same concern is present
         if decision.destination and not state.get("destination"):
             updates["destination"] = decision.destination
         if decision.start_date and not state.get("start_date"):

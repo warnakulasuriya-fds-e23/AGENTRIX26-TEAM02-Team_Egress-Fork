@@ -25,17 +25,20 @@ class RedisCachedPostgresSaver(AsyncPostgresSaver):
         checkpoint_ns = config["configurable"].get("checkpoint_ns", "")
         checkpoint_id = config["configurable"].get("checkpoint_id")
 
+        # [Point to Discuss] [Concern1] Below cach_key is build considering thread_id value as user_id as it was assigned above
         if checkpoint_id:
             cache_key = self._get_cache_key(thread_id, checkpoint_ns, checkpoint_id)
         else:
             cache_key = self._get_cache_key(thread_id, checkpoint_ns, "latest")
-
         cached_tuple = await cache_get_obj(cache_key)
         if cached_tuple is not None:
             logger.debug(f"Cache HIT for {cache_key}")
             return cached_tuple
 
         logger.debug(f"Cache MISS for {cache_key}")
+        # [Point to Discuss] [Concern1] Here we call the inherited function to fetch the relevant tuple,
+        # [Point to Discuss] [Concern1] However the inherited function looks for thread_id value to be in config["thread_id"] not 
+        # [Point to Discuss] [Concern1] the config["user_id"] value so the written db_tuple
         db_tuple = await super().aget_tuple(config)
 
         if db_tuple is not None:
@@ -60,6 +63,11 @@ class RedisCachedPostgresSaver(AsyncPostgresSaver):
         specific_key = self._get_cache_key(thread_id, checkpoint_ns, checkpoint["id"])
 
         await cache_delete(latest_key)
+        # [Point to Discuss] [Concern2] Deleting the cached tuple for specific key doesnt seem needed because the 
+        # [Point to Discuss] [Concern2] checkpoint["id"] will always yield a fresh UUID because we are just writing
+        # [Point to Discuss] [Concern2] a new checkpoint in this function. That will not be cached anyways
+        # [Point to Discuss] [Concern2] however removing latest checkpoint seems to be valid or else at the next
+        # [Point to Discuss] [Concern2] aget we would get stale date from the cache.
         await cache_delete(specific_key)
 
         return result

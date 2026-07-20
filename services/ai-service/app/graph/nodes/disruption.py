@@ -61,6 +61,7 @@ async def handle_disruption(state: GraphState) -> GraphState:
     # The disruption path runs BEFORE the alerts node, so live_alerts in state
     # is either absent or stale from a previous conversation turn.  Always fetch
     # fresh alerts here; fall back to state only when the live fetch fails.
+    # [Point to Discuss] [Concern4] Can state really posses live_alerts before this?
     live_alerts = await _fetch_alerts_inline() or state.get("live_alerts")
     alerts_section = ""
     if live_alerts:
