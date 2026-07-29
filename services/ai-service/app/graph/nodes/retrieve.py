@@ -10,6 +10,7 @@ locations that have verified transport routes in the graph.
 """
 import asyncio
 import logging
+from typing import Any
 
 from app.db.qdrant_collections import (
     ACTIVITIES,

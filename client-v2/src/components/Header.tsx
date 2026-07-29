@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import { Icon } from '@/components/ui/Icon'
 import { NotificationsMenu } from '@/components/ui/NotificationsMenu'
 import { useApp } from '@/state/store'
@@ -114,28 +115,56 @@ export function Header() {
             whiteSpace: 'nowrap',
           }}
         >
-          <button
-            type="button"
-            onClick={openLogin}
-            aria-label="Log in"
-            data-hover="outline"
-            data-hide-sm
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 36,
-              height: 36,
-              border: `1px solid ${c.lineStrong}`,
-              borderRadius: 999,
-              background: '#fff',
-              color: c.ink,
-              cursor: 'pointer',
-              flex: 'none',
-            }}
-          >
-            <Icon name="Person" size={16} />
-          </button>
+          <SignedOut>
+            <div data-hide-sm style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 'none' }}>
+              <button
+                type="button"
+                onClick={openLogin}
+                data-hover="outline"
+                style={{
+                  height: 36,
+                  padding: '0 16px',
+                  border: `1px solid ${c.lineStrong}`,
+                  borderRadius: 999,
+                  background: '#fff',
+                  color: c.ink,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  flex: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                onClick={openSignup}
+                data-hover="primary"
+                style={{
+                  height: 36,
+                  padding: '0 16px',
+                  border: 'none',
+                  borderRadius: 999,
+                  background: c.primary,
+                  color: '#fff',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  flex: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Sign up
+              </button>
+            </div>
+          </SignedOut>
+
+          <SignedIn>
+            <div style={{ display: 'flex', flex: 'none' }}>
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
 
           <NotificationsMenu />
 
@@ -244,50 +273,59 @@ export function Header() {
             </a>
           ))}
 
-          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false)
-                openLogin()
-              }}
-              data-hover="outline"
-              style={{
-                flex: 1,
-                height: 44,
-                border: `1px solid ${c.lineStrong}`,
-                borderRadius: 999,
-                background: '#fff',
-                color: c.ink,
-                fontSize: 14.5,
-                fontWeight: 500,
-                cursor: 'pointer',
-              }}
-            >
-              Log in
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false)
-                openSignup()
-              }}
-              data-hover="primary"
-              style={{
-                flex: 1,
-                height: 44,
-                border: 'none',
-                borderRadius: 999,
-                background: c.primary,
-                color: '#fff',
-                fontSize: 14.5,
-                fontWeight: 500,
-                cursor: 'pointer',
-              }}
-            >
-              Sign up
-            </button>
-          </div>
+          <SignedOut>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false)
+                  openLogin()
+                }}
+                data-hover="outline"
+                style={{
+                  flex: 1,
+                  height: 44,
+                  border: `1px solid ${c.lineStrong}`,
+                  borderRadius: 999,
+                  background: '#fff',
+                  color: c.ink,
+                  fontSize: 14.5,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false)
+                  openSignup()
+                }}
+                data-hover="primary"
+                style={{
+                  flex: 1,
+                  height: 44,
+                  border: 'none',
+                  borderRadius: 999,
+                  background: c.primary,
+                  color: '#fff',
+                  fontSize: 14.5,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
+              >
+                Sign up
+              </button>
+            </div>
+          </SignedOut>
+
+          <SignedIn>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16 }}>
+              <UserButton afterSignOutUrl="/" />
+              <span style={{ fontSize: 14, color: c.body }}>Account</span>
+            </div>
+          </SignedIn>
         </nav>
       )}
     </header>
