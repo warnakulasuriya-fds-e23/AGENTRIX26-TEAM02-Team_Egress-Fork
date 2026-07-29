@@ -147,6 +147,10 @@ class Settings(BaseSettings):
         default="TravelPlatformAI/0.1 (Sri Lanka trip planner; contact@travelplatform.lk)"
     )
 
+    # Internal service-to-service (admin role lookups piggyback on user-service's
+    # existing Clerk-verified /me endpoint rather than duplicating auth here).
+    user_service_url: str = Field(default="http://user-service:8002")
+
     # Cache TTLs (seconds). Volatile data is cached short; content longer.
     cache_ttl_weather: int = Field(default=1800)       # 30 min
     cache_ttl_geocode: int = Field(default=2592000)    # 30 days

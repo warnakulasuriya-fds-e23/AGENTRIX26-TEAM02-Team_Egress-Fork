@@ -8,10 +8,10 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useAuth } from '@clerk/clerk-react'
 
 import { BASE_ITINERARY, EXTRA_DAY } from '@/data/catalogue'
 import { CHANNEL_NAMES, PLANS, VOICE_SCRIPT } from '@/data/content'
-import type { SearchTabId } from '@/data/content'
 import { ApiError, chatWithAgent } from '@/lib/api'
 import { config } from '@/lib/config'
 import { makeMoney, parsePrice } from '@/lib/money'
@@ -95,6 +95,7 @@ function useAppStore() {
 
   const [conversationId, setConversationId] = useState<string | null>(null)
   const searchRequest = useRef(0)
+  const { userId } = useAuth()
 
   /**
    * Gate for anything the AI does. Counts the use, opens the paywall once the
@@ -128,7 +129,7 @@ function useAppStore() {
       setResults([])
       setCriteria(buildCriteria(parseQuery(q)))
 
-      chatWithAgent({ message: q, conversation_id: conversationId })
+      chatWithAgent({ message: q, conversation_id: conversationId, user_id: userId })
         .then((data) => {
           if (searchRequest.current !== requestId) return // a newer query already landed
           setConversationId(data.conversation_id)
@@ -145,7 +146,7 @@ function useAppStore() {
           setStatus('done')
         })
     },
-    [conversationId],
+    [conversationId, userId],
   )
 
   const submitQuery = useCallback(() => search(query), [search, query])

@@ -15,7 +15,7 @@ const NAV = [
 ]
 
 export function Header() {
-  const { toggleCart, cart, openLogin, openSignup, user, logout } = useApp()
+  const { toggleCart, cart, openLogin, openSignup, user } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (

@@ -1,5 +1,7 @@
 import { Activities } from '@/components/Activities'
+import { AdminDashboard } from '@/components/AdminDashboard'
 import { AuthModal } from '@/components/AuthModal'
+import { AuthSync } from '@/components/AuthSync'
 import { CartDrawer } from '@/components/CartDrawer'
 import { Companion } from '@/components/Companion'
 import { Faq } from '@/components/Faq'
@@ -15,30 +17,42 @@ import { Transport } from '@/components/Transport'
 import { VoiceGuide } from '@/components/VoiceGuide'
 import { AppProvider } from '@/state/store'
 
+// No router in this prototype (single scrolling page) — /admin is the one
+// exception, checked once at load. Reload the page to leave it.
+const isAdminPath = window.location.pathname.replace(/\/+$/, '') === '/admin'
+
 export default function App() {
   return (
     <AppProvider>
-      <Header />
+      <AuthSync />
 
-      <main>
-        <Hero />
-        <SearchPanel />
-        <Stays />
-        <Activities />
-        <Transport />
-        <Packages />
-        <Companion />
-        <Plans />
-        <Faq />
-      </main>
+      {isAdminPath ? (
+        <AdminDashboard />
+      ) : (
+        <>
+          <Header />
 
-      <Footer />
+          <main>
+            <Hero />
+            <SearchPanel />
+            <Stays />
+            <Activities />
+            <Transport />
+            <Packages />
+            <Companion />
+            <Plans />
+            <Faq />
+          </main>
 
-      {/* Overlays */}
-      <CartDrawer />
-      <PaywallModal />
-      <VoiceGuide />
-      <AuthModal />
+          <Footer />
+
+          {/* Overlays */}
+          <CartDrawer />
+          <PaywallModal />
+          <VoiceGuide />
+          <AuthModal />
+        </>
+      )}
     </AppProvider>
   )
 }
