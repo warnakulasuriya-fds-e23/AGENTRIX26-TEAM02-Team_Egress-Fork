@@ -17,6 +17,8 @@ from app.core.pricing import estimate_cost
 from app.db.qdrant import get_qdrant
 from app.db.qdrant_collections import COLLECTION_SPECS
 from app.models.agent_run import AgentRun
+from app.models.feedback import Feedback
+from app.models.page_visit import PageVisit
 
 logger = logging.getLogger(__name__)
 
@@ -157,3 +159,122 @@ async def token_usage_stats(days: int = 30) -> dict:
     except Exception as exc:  # noqa: BLE001 - LangSmith API hiccup shouldn't 500 the dashboard
         logger.warning("LangSmith token stats fetch failed: %s", exc)
         return {"available": False, "reason": str(exc)}
+
+
+@router.get("/visitors")
+async def visitor_stats(session: SessionDep) -> dict:
+    """Real visit counts from the page-visit beacon (see routes/tracking.py).
+
+    "Active now" = distinct visitor_id with a beacon in the last 15 minutes —
+    a heartbeat proxy, not a true live-session count (no websocket/presence).
+    """
+    now = datetime.now(timezone.utc)
+
+    total_visits = (await session.execute(select(func.count(PageVisit.id)))).scalar_one()
+    unique_visitors = (
+        await session.execute(select(func.count(func.distinct(PageVisit.visitor_id))))
+    ).scalar_one()
+    registered_visitors = (
+        await session.execute(
+            select(func.count(func.distinct(PageVisit.visitor_id))).where(PageVisit.user_id.is_not(None))
+        )
+    ).scalar_one()
+    active_now = (
+        await session.execute(
+            select(func.count(func.distinct(PageVisit.visitor_id))).where(
+                PageVisit.created_at >= now - timedelta(minutes=15)
+            )
+        )
+    ).scalar_one()
+    last_24h = (
+        await session.execute(
+            select(func.count(func.distinct(PageVisit.visitor_id))).where(
+                PageVisit.created_at >= now - timedelta(hours=24)
+            )
+        )
+    ).scalar_one()
+
+    return {
+        "total_visits": total_visits,
+        "unique_visitors": unique_visitors,
+        "registered_visitors": registered_visitors,
+        "active_now": active_now,
+        "unique_last_24h": last_24h,
+    }
+
+
+@router.get("/agent-activity")
+async def agent_activity(session: SessionDep, limit: int = 25) -> dict:
+    """Recent AgentRun rows — a real activity log, not a mock feed."""
+    rows = (
+        await session.execute(
+            select(AgentRun.id, AgentRun.run_type, AgentRun.status, AgentRun.user_id, AgentRun.created_at)
+            .order_by(AgentRun.created_at.desc())
+            .limit(limit)
+        )
+    ).all()
+    return {
+        "runs": [
+            {
+                "id": str(r.id),
+                "run_type": r.run_type,
+                "status": r.status,
+                "user_id": r.user_id,
+                "created_at": r.created_at.isoformat(),
+            }
+            for r in rows
+        ]
+    }
+
+
+@router.get("/feedback")
+async def feedback_stats(session: SessionDep, limit: int = 25) -> dict:
+    """Aggregate thumbs up/down + category breakdown + recent items."""
+    rating_rows = (
+        await session.execute(select(Feedback.rating, func.count(Feedback.id)).group_by(Feedback.rating))
+    ).all()
+    category_rows = (
+        await session.execute(
+            select(Feedback.category, func.count(Feedback.id)).group_by(Feedback.category)
+        )
+    ).all()
+    recent = (
+        await session.execute(
+            select(
+                Feedback.id, Feedback.rating, Feedback.category, Feedback.comment, Feedback.created_at
+            )
+            .order_by(Feedback.created_at.desc())
+            .limit(limit)
+        )
+    ).all()
+
+    return {
+        "by_rating": {rating: count for rating, count in rating_rows},
+        "by_category": {(category or "uncategorized"): count for category, count in category_rows},
+        "recent": [
+            {
+                "id": str(r.id),
+                "rating": r.rating,
+                "category": r.category,
+                "comment": r.comment,
+                "created_at": r.created_at.isoformat(),
+            }
+            for r in recent
+        ],
+    }
+
+
+@router.get("/queries-by-month")
+async def queries_by_month(session: SessionDep, months: int = 12) -> dict:
+    """Monthly chat-run volume for the last N months — the "User Queries" chart."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=months * 31)
+    bucket = func.date_trunc("month", AgentRun.created_at)
+    rows = (
+        await session.execute(
+            select(bucket.label("month"), func.count(AgentRun.id))
+            .where(AgentRun.created_at >= cutoff)
+            .group_by(bucket)
+            .order_by(bucket)
+        )
+    ).all()
+    return {"months": [{"month": month.strftime("%Y-%m"), "count": count} for month, count in rows]}

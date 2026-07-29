@@ -12,7 +12,7 @@ import { useAuth } from '@clerk/clerk-react'
 
 import { BASE_ITINERARY, EXTRA_DAY } from '@/data/catalogue'
 import { CHANNEL_NAMES, PLANS, VOICE_SCRIPT } from '@/data/content'
-import { ApiError, chatWithAgent } from '@/lib/api'
+import { ApiError, chatWithAgent, submitFeedback } from '@/lib/api'
 import { config } from '@/lib/config'
 import { makeMoney, parsePrice } from '@/lib/money'
 import { buildCriteria, parseQuery } from '@/lib/search'
@@ -94,6 +94,8 @@ function useAppStore() {
   const [activityFilter, setActivityFilter] = useState('All')
 
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [lastRunId, setLastRunId] = useState<string | null>(null)
+  const [feedbackGiven, setFeedbackGiven] = useState<'up' | 'down' | null>(null)
   const searchRequest = useRef(0)
   const { userId } = useAuth()
 
@@ -128,11 +130,13 @@ function useAppStore() {
       setTyped(0)
       setResults([])
       setCriteria(buildCriteria(parseQuery(q)))
+      setFeedbackGiven(null)
 
       chatWithAgent({ message: q, conversation_id: conversationId, user_id: userId })
         .then((data) => {
           if (searchRequest.current !== requestId) return // a newer query already landed
           setConversationId(data.conversation_id)
+          setLastRunId(data.run_id)
           setAnswer(data.reply)
           setStatus('done')
         })
@@ -158,6 +162,17 @@ function useAppStore() {
       search(text)
     },
     [search],
+  )
+
+  /** Thumbs up/down on the last AI reply. One vote per reply, fire-and-forget. */
+  const giveFeedback = useCallback(
+    (rating: 'up' | 'down') => {
+      setFeedbackGiven(rating)
+      submitFeedback({ run_id: lastRunId, user_id: userId, rating, category: 'chat' }).catch(() => {
+        // Feedback is best-effort — don't block or alarm the user over it.
+      })
+    },
+    [lastRunId, userId],
   )
 
   // Type the AI overview out one chunk at a time.
@@ -387,6 +402,9 @@ function useAppStore() {
     submitQuery,
     askSuggestion,
     travellers,
+    lastRunId,
+    feedbackGiven,
+    giveFeedback,
 
     // monetisation
     paywallOpen,

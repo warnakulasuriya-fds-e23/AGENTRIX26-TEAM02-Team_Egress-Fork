@@ -74,6 +74,7 @@ export interface AgentItinerary {
 
 export interface ChatResponse {
   conversation_id: string
+  run_id: string
   reply: string
   plan_changed: boolean
   itinerary?: AgentItinerary | null
@@ -81,6 +82,19 @@ export interface ChatResponse {
 
 /** Real "Ask AI" call — routed through Kong to the ai-service's LangGraph agent. */
 export const chatWithAgent = (payload: ChatRequest) => api.post<ChatResponse>('/ai/chat', payload)
+
+// --- Tracking (ai-service, public — visitors may be anonymous) --------------
+
+export const trackVisit = (visitor_id: string, path: string, user_id?: string | null) =>
+  api.post<void>('/ai/track-visit', { visitor_id, path, user_id })
+
+export const submitFeedback = (payload: {
+  run_id?: string | null
+  user_id?: string | null
+  rating: 'up' | 'down'
+  category?: string | null
+  comment?: string | null
+}) => api.post<void>('/ai/feedback', payload)
 
 // --- Users (user-service, via Kong) -----------------------------------------
 
@@ -131,3 +145,42 @@ export interface TokenStats {
 export const getVectorDbStats = (token: string) => api.get<VectorDbStats>('/ai/admin/vector-db', token)
 export const getAiUsageStats = (token: string) => api.get<AiUsageStats>('/ai/admin/ai-usage', token)
 export const getTokenStats = (token: string) => api.get<TokenStats>('/ai/admin/tokens', token)
+
+export interface VisitorStats {
+  total_visits: number
+  unique_visitors: number
+  registered_visitors: number
+  active_now: number
+  unique_last_24h: number
+}
+
+export interface AgentActivityRun {
+  id: string
+  run_type: string
+  status: string
+  user_id: string | null
+  created_at: string
+}
+
+export interface FeedbackStats {
+  by_rating: Record<string, number>
+  by_category: Record<string, number>
+  recent: Array<{
+    id: string
+    rating: string
+    category: string | null
+    comment: string | null
+    created_at: string
+  }>
+}
+
+export interface QueriesByMonth {
+  months: Array<{ month: string; count: number }>
+}
+
+export const getVisitorStats = (token: string) => api.get<VisitorStats>('/ai/admin/visitors', token)
+export const getAgentActivity = (token: string) =>
+  api.get<{ runs: AgentActivityRun[] }>('/ai/admin/agent-activity', token)
+export const getFeedbackStats = (token: string) => api.get<FeedbackStats>('/ai/admin/feedback', token)
+export const getQueriesByMonth = (token: string) =>
+  api.get<QueriesByMonth>('/ai/admin/queries-by-month', token)

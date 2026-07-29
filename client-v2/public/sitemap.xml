@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Single-page app today — one entry. Add a <url> per route if this ever
+     grows real, server-rendered routes (see the Marketing dashboard panel's
+     note on client-side-only rendering before expecting this to help much). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ceylontrips.example.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

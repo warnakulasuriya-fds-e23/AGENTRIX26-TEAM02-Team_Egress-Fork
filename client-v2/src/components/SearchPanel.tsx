@@ -435,8 +435,31 @@ function Thinking() {
   )
 }
 
+const feedbackBtnStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 28,
+  height: 28,
+  border: `1px solid ${c.lineStrong}`,
+  borderRadius: 8,
+  background: '#fff',
+  color: c.textMuted,
+  cursor: 'pointer',
+} as const
+
 function Results() {
-  const { criteria, typedAnswer, streaming, results, addToCart, askSuggestion, money } = useApp()
+  const {
+    criteria,
+    typedAnswer,
+    streaming,
+    results,
+    addToCart,
+    askSuggestion,
+    money,
+    feedbackGiven,
+    giveFeedback,
+  } = useApp()
 
   return (
     <div style={{ marginTop: 24, animation: 'csRise .4s ease both' }}>
@@ -525,6 +548,47 @@ function Results() {
             ),
           )}
         </div>
+
+        {!streaming && typedAnswer && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginTop: 14,
+              paddingTop: 14,
+              borderTop: '1px solid #eee9e3',
+            }}
+          >
+            <span style={{ fontSize: 12.5, color: c.textMuted }}>Was this helpful?</span>
+            {feedbackGiven ? (
+              <span style={{ fontSize: 12.5, color: c.greenInk, fontWeight: 500 }}>
+                Thanks for the feedback
+              </span>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => giveFeedback('up')}
+                  aria-label="Helpful"
+                  data-hover="outline"
+                  style={feedbackBtnStyle}
+                >
+                  <Icon name="ThumbUp" size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => giveFeedback('down')}
+                  aria-label="Not helpful"
+                  data-hover="outline"
+                  style={feedbackBtnStyle}
+                >
+                  <Icon name="ThumbDown" size={14} />
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Ranked results */}

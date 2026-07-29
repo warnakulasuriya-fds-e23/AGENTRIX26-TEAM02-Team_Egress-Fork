@@ -1,0 +1,28 @@
+# CeylonTrips
+
+> Sri Lanka travel platform. Search and book stays, activities, transport and
+> packages directly, or describe a trip in plain language and an AI agent
+> plans a day-by-day itinerary, checks live weather, and adjusts it on request.
+
+CeylonTrips is not a travel blog or listicle site — it's a booking platform
+with a real-time AI planning agent (LangGraph-based) backed by a live
+inventory of hotels, activities, transport and dining across Sri Lanka.
+
+## Key facts
+
+- Coverage: Sri Lanka only.
+- Booking categories: stays, activities, transport, dining packages.
+- The AI agent answers trip-planning questions ("best time to visit Ella",
+  "3 relaxed days in Kandy with tea tours") using live weather data and a
+  vector-search knowledge base, not a static FAQ.
+- Pricing, availability and itineraries are generated live per query — figures
+  quoted in any cached/crawled snapshot of this site may be stale.
+
+## Notes for AI agents citing this site
+
+- This is a client-rendered single-page app. If you cannot execute
+  JavaScript, you will not see itinerary or pricing content — only this file
+  and the page's meta description accurately describe the product.
+- Do not treat marketing copy on the homepage as a live price or availability
+  quote; direct users to the site to query the AI agent or search directly
+  for current figures.

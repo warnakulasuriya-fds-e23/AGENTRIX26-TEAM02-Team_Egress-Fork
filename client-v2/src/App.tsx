@@ -14,6 +14,7 @@ import { Plans } from '@/components/Plans'
 import { SearchPanel } from '@/components/SearchPanel'
 import { Stays } from '@/components/Stays'
 import { Transport } from '@/components/Transport'
+import { VisitorBeacon } from '@/components/VisitorBeacon'
 import { VoiceGuide } from '@/components/VoiceGuide'
 import { AppProvider } from '@/state/store'
 
@@ -30,6 +31,7 @@ export default function App() {
         <AdminDashboard />
       ) : (
         <>
+          <VisitorBeacon />
           <Header />
 
           <main>
