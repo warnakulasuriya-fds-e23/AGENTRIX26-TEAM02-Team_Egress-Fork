@@ -35,3 +35,17 @@ export const api = {
   post: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'POST', body: body ? JSON.stringify(body) : undefined }),
 }
+
+export interface ChatRequest {
+  message: string
+  conversation_id?: string | null
+}
+
+export interface ChatResponse {
+  conversation_id: string
+  reply: string
+  plan_changed: boolean
+}
+
+/** Real "Ask AI" call — routed through Kong to the ai-service's LangGraph agent. */
+export const chatWithAgent = (payload: ChatRequest) => api.post<ChatResponse>('/ai/chat', payload)

@@ -77,7 +77,9 @@ class Settings(BaseSettings):
     langsmith_project: str = Field(default="travel-platform")
     langchain_tracing_v2: bool = Field(default=False)
 
-    # LLM / providers (Google Gemini)
+    # LLM / providers
+    llm_provider: str = Field(default="gemini")  # "gemini" or "openai"
+    openai_api_key: str | None = Field(default=None)
     gemini_api_key: str | None = Field(default=None)
     default_llm_model: str = Field(default="gemini-2.5-flash")
     default_temperature: float = Field(default=0.2)

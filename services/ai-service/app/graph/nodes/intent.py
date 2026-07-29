@@ -7,7 +7,7 @@ structured-output mode so the result is always a valid label.
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.core.prompts import INTENT_SYSTEM_PROMPT
-from app.graph.llm import get_chat_model
+from app.graph.llm import get_structured_model
 from app.graph.state import GraphState
 from app.graph.utils import latest_user_text
 from app.schemas.ai import IntentDecision
@@ -22,7 +22,7 @@ async def classify_intent(state: GraphState) -> GraphState:
     if not text:
         return {"intent": "chat"}
 
-    model = get_chat_model("tertiary").with_structured_output(IntentDecision)
+    model = get_structured_model("tertiary", IntentDecision)
     decision: IntentDecision = await model.ainvoke(
         [SystemMessage(content=INTENT_SYSTEM_PROMPT), HumanMessage(content=text)]
     )

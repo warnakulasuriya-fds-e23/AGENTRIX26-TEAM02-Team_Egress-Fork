@@ -4,7 +4,7 @@ import json
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from app.core.prompts import PLANNER_SYSTEM_PROMPT
-from app.graph.llm import get_chat_model
+from app.graph.llm import get_structured_model
 from app.graph.state import GraphState
 from app.schemas.ai import PlannerOutput
 
@@ -29,7 +29,7 @@ def _conversation_summary(state: GraphState, max_turns: int = 4) -> str:
 
 
 async def plan(state: GraphState) -> GraphState:
-    model = get_chat_model("primary").with_structured_output(PlannerOutput)
+    model = get_structured_model("primary", PlannerOutput)
 
     # Group retrieved hits by source collection so the LLM gets a structured
     # view (hotels first, then activities, dining, transport, culture/events)

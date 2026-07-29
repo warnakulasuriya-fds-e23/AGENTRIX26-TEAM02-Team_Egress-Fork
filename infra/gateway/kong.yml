@@ -3,6 +3,11 @@ _format_version: "3.0"
 services:
   - name: ai-service
     url: http://ai-service:8000
+    # LLM/RAG orchestration (LangGraph, reranking, tool calls) regularly runs past
+    # Kong's 60s default — a real chat turn timed out here during testing.
+    connect_timeout: 10000
+    write_timeout: 180000
+    read_timeout: 180000
     routes:
       - name: ai-route
         paths:

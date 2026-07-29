@@ -132,7 +132,7 @@ export function runSearch(query: string, limit: number) {
   return { results, criteria: buildCriteria(parsed), answer: buildAnswer(parsed, results) }
 }
 
-function buildCriteria(q: ParsedQuery): string[] {
+export function buildCriteria(q: ParsedQuery): string[] {
   const criteria: string[] = []
   if (q.kind) criteria.push(`${q.kind}s`)
   if (q.nights) criteria.push(`${q.nights} nights`)

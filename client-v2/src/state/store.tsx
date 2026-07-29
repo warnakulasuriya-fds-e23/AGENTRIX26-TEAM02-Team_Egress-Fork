@@ -12,9 +12,10 @@ import {
 import { BASE_ITINERARY, EXTRA_DAY } from '@/data/catalogue'
 import { CHANNEL_NAMES, PLANS, VOICE_SCRIPT } from '@/data/content'
 import type { SearchTabId } from '@/data/content'
+import { ApiError, chatWithAgent } from '@/lib/api'
 import { config } from '@/lib/config'
 import { makeMoney, parsePrice } from '@/lib/money'
-import { runSearch } from '@/lib/search'
+import { buildCriteria, parseQuery } from '@/lib/search'
 import type {
   CartDraft,
   CartItem,
@@ -98,7 +99,8 @@ function useAppStore() {
   const [openFaq, setOpenFaq] = useState(0)
   const [activityFilter, setActivityFilter] = useState('All')
 
-  const searchTimer = useRef<number | undefined>(undefined)
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const searchRequest = useRef(0)
 
   /**
    * Gate for anything the AI does. Counts the use, opens the paywall once the
@@ -120,22 +122,37 @@ function useAppStore() {
 
   // --- search actions ----------------------------------------------------
 
-  const search = useCallback((text: string) => {
-    const q = text.trim()
-    if (!q) return
+  /** Real call to the AI agent, through Kong, no mock data. */
+  const search = useCallback(
+    (text: string) => {
+      const q = text.trim()
+      if (!q) return
 
-    window.clearTimeout(searchTimer.current)
-    setStatus('thinking')
-    setTyped(0)
+      const requestId = ++searchRequest.current
+      setStatus('thinking')
+      setTyped(0)
+      setResults([])
+      setCriteria(buildCriteria(parseQuery(q)))
 
-    searchTimer.current = window.setTimeout(() => {
-      const outcome = runSearch(q, config.resultCount)
-      setResults(outcome.results)
-      setCriteria(outcome.criteria)
-      setAnswer(outcome.answer)
-      setStatus(outcome.results.length ? 'done' : 'empty')
-    }, Math.max(0, config.thinkingDelay))
-  }, [])
+      chatWithAgent({ message: q, conversation_id: conversationId })
+        .then((data) => {
+          if (searchRequest.current !== requestId) return // a newer query already landed
+          setConversationId(data.conversation_id)
+          setAnswer(data.reply)
+          setStatus('done')
+        })
+        .catch((err) => {
+          if (searchRequest.current !== requestId) return
+          setAnswer(
+            err instanceof ApiError
+              ? `The AI agent couldn't be reached (HTTP ${err.status}). Please try again.`
+              : "The AI agent couldn't be reached. Check your connection and try again.",
+          )
+          setStatus('done')
+        })
+    },
+    [conversationId],
+  )
 
   const submitQuery = useCallback(
     () => useAiFeature(() => search(query)),
@@ -174,7 +191,6 @@ function useAppStore() {
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(searchTimer.current)
       window.clearTimeout(voiceThinkTimer.current)
     }
   }, [])

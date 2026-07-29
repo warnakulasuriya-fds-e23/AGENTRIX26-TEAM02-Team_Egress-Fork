@@ -4,7 +4,7 @@ import logging
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from app.core.prompts import OUTPUT_GUARDRAIL_SYSTEM_PROMPT
-from app.graph.llm import get_chat_model
+from app.graph.llm import get_structured_model
 from app.graph.state import GraphState
 from app.schemas.ai import OutputGuardrailDecision
 
@@ -28,7 +28,7 @@ async def output_guardrail(state: GraphState) -> GraphState:
     eval_text = "\n\n".join(eval_parts)
 
     # We use the fastest tertiary model for guardrailing to minimize latency
-    model = get_chat_model("tertiary").with_structured_output(OutputGuardrailDecision)
+    model = get_structured_model("tertiary", OutputGuardrailDecision)
     
     logger.info("Evaluating output safety...")
     
