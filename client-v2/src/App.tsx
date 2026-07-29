@@ -8,10 +8,10 @@ import { Header } from '@/components/Header'
 import { Hero } from '@/components/Hero'
 import { Packages } from '@/components/Packages'
 import { PaywallModal } from '@/components/PaywallModal'
-import { Planner } from '@/components/Planner'
 import { Plans } from '@/components/Plans'
 import { SearchPanel } from '@/components/SearchPanel'
 import { Stays } from '@/components/Stays'
+import { Transport } from '@/components/Transport'
 import { VoiceGuide } from '@/components/VoiceGuide'
 import { AppProvider } from '@/state/store'
 
@@ -23,11 +23,11 @@ export default function App() {
       <main>
         <Hero />
         <SearchPanel />
-        <Planner />
-        <Companion />
         <Stays />
         <Activities />
+        <Transport />
         <Packages />
+        <Companion />
         <Plans />
         <Faq />
       </main>

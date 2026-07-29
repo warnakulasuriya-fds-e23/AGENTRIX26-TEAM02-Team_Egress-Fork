@@ -11,7 +11,7 @@ import { useApp } from '@/state/store'
  * padding/shadow via `appearance` broke its internal layout, so we don't.
  */
 export function AuthModal() {
-  const { authOpen, authMode, setAuthMode, closeAuth } = useApp()
+  const { authOpen, authMode, setAuthMode, closeAuth, login } = useApp()
   const isLogin = authMode === 'login'
 
   if (!authOpen) return null

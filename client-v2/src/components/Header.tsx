@@ -2,18 +2,20 @@ import { useState } from 'react'
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import { Icon } from '@/components/ui/Icon'
 import { NotificationsMenu } from '@/components/ui/NotificationsMenu'
+import { ProfileMenu } from '@/components/ui/ProfileMenu'
 import { useApp } from '@/state/store'
 import { c } from '@/lib/theme'
 
 const NAV = [
   { href: '#stays', label: 'Stays' },
   { href: '#activities', label: 'Activities' },
+  { href: '#transport', label: 'Transport' },
   { href: '#packages', label: 'Packages' },
   { href: '#companion', label: 'AI Tour Guider', ai: true },
 ]
 
 export function Header() {
-  const { toggleCart, cart, openLogin, openSignup } = useApp()
+  const { toggleCart, cart, openLogin, openSignup, user, logout } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -213,6 +215,38 @@ export function Header() {
               </span>
             )}
           </button>
+
+          {user ? (
+            <ProfileMenu />
+          ) : (
+            <button
+              type="button"
+              onClick={openLogin}
+              aria-label="Log in"
+              data-hover="outline"
+              data-hide-sm
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                height: 36,
+                padding: '0 16px',
+                border: `1px solid ${c.lineStrong}`,
+                borderRadius: 999,
+                background: '#fff',
+                color: c.ink,
+                fontSize: 14.5,
+                fontWeight: 500,
+                cursor: 'pointer',
+                flex: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Icon name="Person" size={16} />
+              Log in
+            </button>
+          )}
 
           <button
             type="button"
