@@ -1,3 +1,9 @@
+We perform a live presentation to a bunch of business domain people + some technical domain people. Majority is business domain people. The following Prospects are quite complicated. We need the complexity to be abstracted away. Read the text in [Complex-prospects-starts] [Complex-prospects-end], but dont try to implement it to the last word. I expect you to abstract the complexity appropriately and provide two interactive designs. Must be clickable and interactive , giving the "wow feeling" to the audience. One design to show the website when viewed on Mobile , the other to show the website when viewed on widescreen.
+
+# Core Interaction feature VERY VERY IMPORTANT
+The user must have a clear visual indicator to switch between AI mode and classic mode in BOTH THE MOBILE SCREEN RELATED DESIGN AND THE WIDE SCREEN RELATED DESIGN. Classic mode provides the classic tourism trip planner experience with catalogs, maps , trip tracking, etc in a simple form. AI mode should capture most of the AI related User experiences offered. To get the full idea read [Complex-prospects-starts] [Complex-prospects-end] in a non biased way, dont be too quick to implement it exactly. For the wide screen design you can have a split window which is toggeled to show Classic mode, classic mode with AI mode (the split), AI mode. Lets identify the AI mode as Agentic mode. The requirements of the website should plentifully clear from below prospects.
+
+[Complex-prospects-starts]
 # Tourguider App Design prospects
 We want to design a web based design that is mobile friendly. The thing we are building is a Tourism industry targeted application. Now the main feature of this app is using AI assistant to get many things done. These things , some of them could be done via the UI , but others needs a more complicated flow in the backed and we kinda abstract that complexity away by using the AI Chat and doing it this way. Here are the things:
 - The AI Chat should be very robust and plugged into the rest of the website and the user should be able to feel that the operational capability of the AI is available to them always.
@@ -52,3 +58,8 @@ The following items :
 - Leisure activities
 - Transportation modes
 - Medical Facilities
+[Complex-prospects-end]
+
+
+# Very Important
+Most of the userbase in the targetted tourism market wont be technically fluent users. Users prefer simplicity to get their required task done. That is why although having the futuristic Agent mode is good, we must have a classic trip planner too. Now YOU MUST DESIGN TWO DESIGNS, one to show how it would look like in Mobile and the other to show how it would look like in normal widescreens , interactive designs suitable for a demo catered towards business domain audience. Heres the IMPORTANT PART, the above discussed design is very complex and it needs more abstraction.
