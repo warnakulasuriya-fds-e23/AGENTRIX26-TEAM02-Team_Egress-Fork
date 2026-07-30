@@ -2,7 +2,9 @@ import { Route, Routes } from 'react-router-dom'
 
 import { Activities } from '@/components/Activities'
 import { AiSearchPage } from '@/components/AiSearchPage'
+import { AdminDashboard } from '@/components/AdminDashboard'
 import { AuthModal } from '@/components/AuthModal'
+import { AuthSync } from '@/components/AuthSync'
 import { CartDrawer } from '@/components/CartDrawer'
 import { Companion } from '@/components/Companion'
 import { Faq } from '@/components/Faq'
@@ -18,6 +20,7 @@ import { Stays } from '@/components/Stays'
 import { TourGuidePanel } from '@/components/TourGuidePanel'
 import { TraditionalSearchPage } from '@/components/TraditionalSearchPage'
 import { Transport } from '@/components/Transport'
+<<<<<<< HEAD
 import { PageTransition, TopLoadingBar } from '@/components/ui/PageTransition'
 import { VoiceGuide } from '@/components/VoiceGuide'
 import { AppProvider } from '@/state/store'
@@ -37,10 +40,20 @@ function Home() {
     </>
   )
 }
+=======
+import { VisitorBeacon } from '@/components/VisitorBeacon'
+import { VoiceGuide } from '@/components/VoiceGuide'
+import { AppProvider } from '@/state/store'
+
+// No router in this prototype (single scrolling page) — /admin is the one
+// exception, checked once at load. Reload the page to leave it.
+const isAdminPath = window.location.pathname.replace(/\/+$/, '') === '/admin'
+>>>>>>> main
 
 export default function App() {
   return (
     <AppProvider>
+<<<<<<< HEAD
       <TopLoadingBar />
       <Header />
 
@@ -54,15 +67,47 @@ export default function App() {
           </Routes>
         </PageTransition>
       </main>
+=======
+      <AuthSync />
 
-      <Footer />
+      {isAdminPath ? (
+        <AdminDashboard />
+      ) : (
+        <>
+          <VisitorBeacon />
+          <Header />
+>>>>>>> main
 
+          <main>
+            <Hero />
+            <SearchPanel />
+            <Stays />
+            <Activities />
+            <Transport />
+            <Packages />
+            <Companion />
+            <Plans />
+            <Faq />
+          </main>
+
+<<<<<<< HEAD
       {/* Overlays */}
       <CartDrawer />
       <PaywallModal />
       <VoiceGuide />
       <TourGuidePanel />
       <AuthModal />
+=======
+          <Footer />
+
+          {/* Overlays */}
+          <CartDrawer />
+          <PaywallModal />
+          <VoiceGuide />
+          <AuthModal />
+        </>
+      )}
+>>>>>>> main
     </AppProvider>
   )
 }

@@ -8,12 +8,14 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useAuth } from '@clerk/clerk-react'
 
 import { BASE_ITINERARY, EXTRA_DAY } from '@/data/catalogue'
 import { CHANNEL_NAMES, PLANS, VOICE_SCRIPT } from '@/data/content'
+import { ApiError, chatWithAgent, submitFeedback } from '@/lib/api'
 import { config } from '@/lib/config'
 import { makeMoney, parsePrice } from '@/lib/money'
-import { runSearch } from '@/lib/search'
+import { buildCriteria, parseQuery } from '@/lib/search'
 import type {
   CartDraft,
   CartItem,
@@ -111,7 +113,11 @@ function useAppStore() {
   const [openFaq, setOpenFaq] = useState(0)
   const [activityFilter, setActivityFilter] = useState('All')
 
-  const searchTimer = useRef<number | undefined>(undefined)
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const [lastRunId, setLastRunId] = useState<string | null>(null)
+  const [feedbackGiven, setFeedbackGiven] = useState<'up' | 'down' | null>(null)
+  const searchRequest = useRef(0)
+  const { userId } = useAuth()
 
   /**
    * Gate for anything the AI does. Counts the use, opens the paywall once the
@@ -133,9 +139,11 @@ function useAppStore() {
 
   // --- search actions ----------------------------------------------------
 
-  const search = useCallback((text: string) => {
-    const q = text.trim()
-    if (!q) return
+  /** Real call to the AI agent, through Kong, no mock data. */
+  const search = useCallback(
+    (text: string) => {
+      const q = text.trim()
+      if (!q) return
 
     window.clearTimeout(searchTimer.current)
     setStatus('thinking')
@@ -157,6 +165,33 @@ function useAppStore() {
       setPendingQuery(null)
     }, Math.max(0, config.thinkingDelay))
   }, [])
+      const requestId = ++searchRequest.current
+      setStatus('thinking')
+      setTyped(0)
+      setResults([])
+      setCriteria(buildCriteria(parseQuery(q)))
+      setFeedbackGiven(null)
+
+      chatWithAgent({ message: q, conversation_id: conversationId, user_id: userId })
+        .then((data) => {
+          if (searchRequest.current !== requestId) return // a newer query already landed
+          setConversationId(data.conversation_id)
+          setLastRunId(data.run_id)
+          setAnswer(data.reply)
+          setStatus('done')
+        })
+        .catch((err) => {
+          if (searchRequest.current !== requestId) return
+          setAnswer(
+            err instanceof ApiError
+              ? `The AI agent couldn't be reached (HTTP ${err.status}). Please try again.`
+              : "The AI agent couldn't be reached. Check your connection and try again.",
+          )
+          setStatus('done')
+        })
+    },
+    [conversationId, userId],
+  )
 
   const submitQuery = useCallback(() => search(query), [search, query])
 
@@ -172,6 +207,17 @@ function useAppStore() {
       search(text)
     },
     [search],
+  )
+
+  /** Thumbs up/down on the last AI reply. One vote per reply, fire-and-forget. */
+  const giveFeedback = useCallback(
+    (rating: 'up' | 'down') => {
+      setFeedbackGiven(rating)
+      submitFeedback({ run_id: lastRunId, user_id: userId, rating, category: 'chat' }).catch(() => {
+        // Feedback is best-effort — don't block or alarm the user over it.
+      })
+    },
+    [lastRunId, userId],
   )
 
   // Type the AI overview out one chunk at a time.
@@ -191,7 +237,6 @@ function useAppStore() {
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(searchTimer.current)
       window.clearTimeout(voiceThinkTimer.current)
     }
   }, [])
@@ -433,6 +478,7 @@ function useAppStore() {
     submitQuery,
     askSuggestion,
     travellers,
+<<<<<<< HEAD
     pendingQuery,
 
     // AI search page
@@ -444,6 +490,11 @@ function useAppStore() {
     searchStartDate,
     searchEndDate,
     setSearchDates,
+=======
+    lastRunId,
+    feedbackGiven,
+    giveFeedback,
+>>>>>>> main
 
     // monetisation
     paywallOpen,

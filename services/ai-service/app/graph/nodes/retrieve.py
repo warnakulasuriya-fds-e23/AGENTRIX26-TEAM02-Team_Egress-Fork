@@ -10,6 +10,7 @@ locations that have verified transport routes in the graph.
 """
 import asyncio
 import logging
+from typing import Any
 
 from app.db.qdrant_collections import (
     ACTIVITIES,
@@ -20,7 +21,7 @@ from app.db.qdrant_collections import (
     HOTELS,
     TRANSPORT,
 )
-from app.graph.llm import get_chat_model
+from app.graph.llm import get_structured_model
 from app.graph.state import GraphState
 from app.graph.tools.neo4j_routes import find_places
 from app.graph.tools.qdrant_search import Filters, multi_search
@@ -98,7 +99,7 @@ async def _rerank_with_llm(query: str, hits: list[dict[str, Any]], top_k: int) -
         f"Select the top {top_k} most relevant items and return their indices in order of relevance."
     )
     
-    llm = get_chat_model("reranking").with_structured_output(RerankedIndices)
+    llm = get_structured_model("reranking", RerankedIndices)
     
     try:
         result = await llm.ainvoke(prompt)

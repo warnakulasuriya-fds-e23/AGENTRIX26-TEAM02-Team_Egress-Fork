@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import { Icon } from '@/components/ui/Icon'
 import { NotificationsMenu } from '@/components/ui/NotificationsMenu'
 import { ProfileMenu } from '@/components/ui/ProfileMenu'
@@ -14,7 +15,7 @@ const NAV = [
 ]
 
 export function Header() {
-  const { toggleCart, cart, openLogin, openSignup, user, logout } = useApp()
+  const { toggleCart, cart, openLogin, openSignup, user } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -96,6 +97,57 @@ export function Header() {
             whiteSpace: 'nowrap',
           }}
         >
+          <SignedOut>
+            <div data-hide-sm style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 'none' }}>
+              <button
+                type="button"
+                onClick={openLogin}
+                data-hover="outline"
+                style={{
+                  height: 36,
+                  padding: '0 16px',
+                  border: `1px solid ${c.lineStrong}`,
+                  borderRadius: 999,
+                  background: '#fff',
+                  color: c.ink,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  flex: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                onClick={openSignup}
+                data-hover="primary"
+                style={{
+                  height: 36,
+                  padding: '0 16px',
+                  border: 'none',
+                  borderRadius: 999,
+                  background: c.primary,
+                  color: '#fff',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  flex: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Sign up
+              </button>
+            </div>
+          </SignedOut>
+
+          <SignedIn>
+            <div style={{ display: 'flex', flex: 'none' }}>
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
+
           <NotificationsMenu />
 
           <button
@@ -235,69 +287,7 @@ export function Header() {
             </a>
           ))}
 
-          {user ? (
-            <div style={{ marginTop: 16 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '10px 4px',
-                }}
-              >
-                <span
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 34,
-                    height: 34,
-                    borderRadius: 999,
-                    background: c.primary,
-                    color: '#fff',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    flex: 'none',
-                  }}
-                >
-                  {user.name.trim().charAt(0).toUpperCase() || 'U'}
-                </span>
-                <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: 14.5, fontWeight: 600, color: c.ink }}>{user.name}</p>
-                  <p style={{ fontSize: 12.5, color: c.textMuted, overflowWrap: 'anywhere' }}>
-                    {user.email}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false)
-                  logout()
-                }}
-                data-hover="outline"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  width: '100%',
-                  height: 44,
-                  marginTop: 6,
-                  border: `1px solid ${c.lineStrong}`,
-                  borderRadius: 999,
-                  background: '#fff',
-                  color: c.ink,
-                  fontSize: 14.5,
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                }}
-              >
-                <Icon name="Logout" size={16} />
-                Log out
-              </button>
-            </div>
-          ) : (
+          <SignedOut>
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
               <button
                 type="button"
@@ -342,7 +332,14 @@ export function Header() {
                 Sign up
               </button>
             </div>
-          )}
+          </SignedOut>
+
+          <SignedIn>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16 }}>
+              <UserButton afterSignOutUrl="/" />
+              <span style={{ fontSize: 14, color: c.body }}>Account</span>
+            </div>
+          </SignedIn>
         </nav>
       )}
     </header>

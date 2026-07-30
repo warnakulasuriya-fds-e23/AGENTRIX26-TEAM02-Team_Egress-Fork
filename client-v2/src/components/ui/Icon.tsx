@@ -78,6 +78,12 @@ const PATHS = {
   /** Check circle — confirmed bookings in the companion feed. */
   CheckCircle:
     'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.5 14.5-4-4L7.9 11.1l2.6 2.6 6.6-6.6L18.5 8.5l-8 8Z',
+  /** Thumbs up — positive feedback on an AI reply. */
+  ThumbUp:
+    'M1 21h4V9H1v12Zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2Z',
+  /** Thumbs down — negative feedback on an AI reply. */
+  ThumbDown:
+    'M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2Zm4 0v12h4V3h-4Z',
 } as const
 
 export type IconName = keyof typeof PATHS

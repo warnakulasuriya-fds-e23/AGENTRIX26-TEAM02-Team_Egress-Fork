@@ -77,7 +77,9 @@ class Settings(BaseSettings):
     langsmith_project: str = Field(default="travel-platform")
     langchain_tracing_v2: bool = Field(default=False)
 
-    # LLM / providers (Google Gemini)
+    # LLM / providers
+    llm_provider: str = Field(default="gemini")  # "gemini" or "openai"
+    openai_api_key: str | None = Field(default=None)
     gemini_api_key: str | None = Field(default=None)
     default_llm_model: str = Field(default="gemini-2.5-flash")
     default_temperature: float = Field(default=0.2)
@@ -144,6 +146,10 @@ class Settings(BaseSettings):
     http_user_agent: str = Field(
         default="TravelPlatformAI/0.1 (Sri Lanka trip planner; contact@travelplatform.lk)"
     )
+
+    # Internal service-to-service (admin role lookups piggyback on user-service's
+    # existing Clerk-verified /me endpoint rather than duplicating auth here).
+    user_service_url: str = Field(default="http://user-service:8002")
 
     # Cache TTLs (seconds). Volatile data is cached short; content longer.
     cache_ttl_weather: int = Field(default=1800)       # 30 min

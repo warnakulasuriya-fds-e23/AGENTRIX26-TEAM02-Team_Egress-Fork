@@ -10,6 +10,44 @@
       name="description"
       content="Search and book stays, activities and packages across Sri Lanka — or hand the trip to an AI agent that plans it, watches the weather and news, and tells you what to change."
     />
+
+    <!-- Canonical: update to the real production origin at deploy time. -->
+    <link rel="canonical" href="https://ceylontrips.example.com/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CeylonTrips" />
+    <meta property="og:title" content="CeylonTrips — Book Sri Lanka, or let the AI agent run the trip" />
+    <meta
+      property="og:description"
+      content="Search and book stays, activities and packages across Sri Lanka — or hand the trip to an AI agent that plans it, watches the weather and news, and tells you what to change."
+    />
+    <meta property="og:url" content="https://ceylontrips.example.com/" />
+    <meta property="og:image" content="/images/hero/pexels-aztec92-19287633.jpg" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CeylonTrips — Book Sri Lanka, or let the AI agent run the trip" />
+    <meta
+      name="twitter:description"
+      content="Search and book stays, activities and packages across Sri Lanka — or hand the trip to an AI agent that plans it, watches the weather and news, and tells you what to change."
+    />
+    <meta name="twitter:image" content="/images/hero/pexels-aztec92-19287633.jpg" />
+
+    <!-- Structured data: helps SEO rich results and gives AI answer engines a
+         clean, unambiguous description of what this site/entity is. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TravelAgency",
+        "name": "CeylonTrips",
+        "description": "Search and book stays, activities and packages across Sri Lanka, or hand the trip to an AI agent that plans it, watches the weather and news, and tells you what to change.",
+        "areaServed": {
+          "@type": "Country",
+          "name": "Sri Lanka"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

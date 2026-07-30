@@ -3,7 +3,7 @@ import logging
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from app.core.prompts import GUARDRAIL_SYSTEM_PROMPT
-from app.graph.llm import get_chat_model
+from app.graph.llm import get_structured_model
 from app.graph.state import GraphState
 from app.schemas.ai import GuardrailDecision
 
@@ -23,7 +23,7 @@ async def guardrail(state: GraphState) -> GraphState:
         return {"is_safe": True}
 
     # We use the fastest tertiary model for guardrailing to minimize latency
-    model = get_chat_model("tertiary").with_structured_output(GuardrailDecision)
+    model = get_structured_model("tertiary", GuardrailDecision)
     
     logger.info("Evaluating message safety...")
     
